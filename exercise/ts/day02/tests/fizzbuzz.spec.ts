@@ -9,9 +9,12 @@ describe('FizzBuzz should return', () => {
         min: 1,
         max: 100,
         mapping: new Map<number, string>([
+            [55, 'BuzzBang'],
+            [33, 'FizzBang'],
             [15, 'FizzBuzz'],
             [3, 'Fizz'],
             [5, 'Buzz'],
+            [11, 'Bang'],
         ])
     }
 
@@ -20,14 +23,21 @@ describe('FizzBuzz should return', () => {
         [67, '67'],
         [82, '82'],
         [3, 'Fizz'],
-        [66, 'Fizz'],
-        [99, 'Fizz'],
+        [66, 'FizzBang'],
+        [99, 'FizzBang'],
         [5, 'Buzz'],
         [50, 'Buzz'],
         [85, 'Buzz'],
         [15, 'FizzBuzz'],
         [30, 'FizzBuzz'],
-        [45, 'FizzBuzz']
+        [45, 'FizzBuzz'],
+        [11, 'Bang'],
+        [22, 'Bang'],
+        [33, 'FizzBang'],
+        [44, 'Bang'],
+        [55, 'BuzzBang'],
+        [77, 'Bang'],
+        [88, 'Bang'],
     ])('its representation %s -> %s', (input, expectedResult) => {
         const conversionResult = fizzbuzz(config)(input);
         expect(isSome(conversionResult)).toBeTruthy();
@@ -51,7 +61,7 @@ describe('FizzBuzz should return', () => {
         O.exists(result => validStringsFor(input).includes(result))
     );
 
-    const validStringsFor = (x: number): string[] => ['Fizz', 'Buzz', 'FizzBuzz', x.toString()];
+    const validStringsFor = (x: number): string[] => ['Fizz', 'Buzz', 'FizzBuzz', 'Bang', 'FizzBang', x.toString()];
 
     test('none for numbers out of range', () => {
         fc.assert(
