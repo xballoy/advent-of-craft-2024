@@ -1,10 +1,20 @@
-import {fizzbuzz, max, min} from '../src/fizzbuzz';
+import {fizzbuzz} from '../src/fizzbuzz';
 import * as O from 'fp-ts/Option';
 import {isNone, isSome} from 'fp-ts/Option';
 import * as fc from 'fast-check';
 import {pipe} from 'fp-ts/function';
 
 describe('FizzBuzz should return', () => {
+    const config = {
+        min: 1,
+        max: 100,
+        mapping: new Map<number, string>([
+            [15, 'FizzBuzz'],
+            [3, 'Fizz'],
+            [5, 'Buzz'],
+        ])
+    }
+
     test.each([
         [1, '1'],
         [67, '67'],
@@ -19,7 +29,7 @@ describe('FizzBuzz should return', () => {
         [30, 'FizzBuzz'],
         [45, 'FizzBuzz']
     ])('its representation %s -> %s', (input, expectedResult) => {
-        const conversionResult = fizzbuzz(input);
+        const conversionResult = fizzbuzz(config)(input);
         expect(isSome(conversionResult)).toBeTruthy();
 
         if (isSome(conversionResult)) {
@@ -30,14 +40,14 @@ describe('FizzBuzz should return', () => {
     test('valid strings for numbers between 1 and 100', () => {
         fc.assert(
             fc.property(
-                fc.integer().filter(n => n >= min && n <= max),
+                fc.integer().filter(n => n >= config.min && n <= config.max),
                 (n) => isConvertValid(n)
             )
         );
     });
 
     const isConvertValid = (input: number): boolean => pipe(
-        fizzbuzz(input),
+        fizzbuzz(config)(input),
         O.exists(result => validStringsFor(input).includes(result))
     );
 
@@ -46,8 +56,8 @@ describe('FizzBuzz should return', () => {
     test('none for numbers out of range', () => {
         fc.assert(
             fc.property(
-                fc.integer().filter(n => n < min || n > max),
-                (n) => isNone(fizzbuzz(n))
+                fc.integer().filter(n => n < config.min || n > config.max),
+                (n) => isNone(fizzbuzz(config)(n))
             )
         );
     });
