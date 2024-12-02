@@ -11,12 +11,12 @@ describe('SantaCommunicator', () => {
     let logger: TestLogger;
 
     beforeEach(() => {
-        communicator = new SantaCommunicator(numberOfDaysToRest);
+        communicator = new SantaCommunicator({ numberOfDaysToRest: numberOfDaysToRest, numberOfDaysBeforeChristmas: 24 });
         logger = new TestLogger();
     });
 
     test('composeMessage', () => {
-        const message = communicator.composeMessage({reindeerName : REINDEER_NAME, currentLocation : LOCATION, numbersOfDaysForComingBack : 5, numberOfDaysBeforeChristmas : numberOfDayBeforeChristmas});
+        const message = communicator.composeMessage({reindeerName : REINDEER_NAME, currentLocation : LOCATION, numbersOfDaysForComingBack : 5});
         expect(message).toEqual('Dear Dasher, please return from North Pole in 17 day(s) to be ready and rest before Christmas.');
     });
 
@@ -25,7 +25,6 @@ describe('SantaCommunicator', () => {
             reindeerName: REINDEER_NAME,
             currentLocation: LOCATION,
             numbersOfDaysForComingBack: numberOfDayBeforeChristmas,
-            numberOfDaysBeforeChristmas: numberOfDayBeforeChristmas,
         }, logger);
 
         expect(overdue).toBeTruthy();
@@ -37,7 +36,6 @@ describe('SantaCommunicator', () => {
             reindeerName: REINDEER_NAME,
             currentLocation: LOCATION,
             numbersOfDaysForComingBack: numberOfDayBeforeChristmas - numberOfDaysToRest - 1,
-            numberOfDaysBeforeChristmas: numberOfDayBeforeChristmas,
         }, logger);
         expect(overdue).toBeFalsy();
     });
