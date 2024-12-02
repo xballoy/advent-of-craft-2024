@@ -1,5 +1,12 @@
 import {Logger} from "./logger";
 
+type MessageDetails = {
+    reindeerName: string;
+    currentLocation: string;
+    numbersOfDaysForComingBack: number;
+    numberOfDaysBeforeChristmas: number;
+}
+
 export class SantaCommunicator {
     private readonly numberOfDaysToRest: number;
 
@@ -7,12 +14,17 @@ export class SantaCommunicator {
         this.numberOfDaysToRest = numberOfDaysToRest;
     }
 
-    public composeMessage(reindeerName: string, currentLocation: string, numbersOfDaysForComingBack: number, numberOfDaysBeforeChristmas: number): string {
+    public composeMessage({reindeerName, currentLocation, numbersOfDaysForComingBack, numberOfDaysBeforeChristmas}: MessageDetails): string {
         const daysBeforeReturn = this.daysBeforeReturn(numbersOfDaysForComingBack, numberOfDaysBeforeChristmas);
         return `Dear ${reindeerName}, please return from ${currentLocation} in ${daysBeforeReturn} day(s) to be ready and rest before Christmas.`;
     }
 
-    public isOverdue(reindeerName: string, currentLocation: string, numbersOfDaysForComingBack: number, numberOfDaysBeforeChristmas: number, logger: Logger): boolean {
+    public isOverdue({reindeerName, currentLocation, numbersOfDaysForComingBack, numberOfDaysBeforeChristmas,}: {
+        reindeerName: string,
+        currentLocation: string,
+        numbersOfDaysForComingBack: number,
+        numberOfDaysBeforeChristmas: number,
+    }, logger: Logger): boolean {
         if (this.daysBeforeReturn(numbersOfDaysForComingBack, numberOfDaysBeforeChristmas) <= 0) {
             logger.log(`Overdue for ${reindeerName} located ${currentLocation}.`);
             return true;
