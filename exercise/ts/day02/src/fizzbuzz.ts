@@ -11,12 +11,13 @@ export const fizzbuzz = ({mapping, min, max}: Config) => (input: number): Option
         : some(convertSafely(mapping)(input));
 
 const convertSafely = (mapping: Map<number, string>) => (input: number): string => {
+    const values: string[] = [];
     for (const [divisor, value] of mapping) {
         if (is(divisor, input)) {
-            return value;
+            values.push(value);
         }
     }
-    return input.toString();
+    return values.length ? values.join('') : input.toString();
 };
 
 const is = (divisor: number, input: number): boolean => input % divisor === 0;

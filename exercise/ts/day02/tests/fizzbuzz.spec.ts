@@ -9,12 +9,6 @@ describe('FizzBuzz should return', () => {
         min: 1,
         max: 100,
         mapping: new Map<number, string>([
-            [77, 'WhizzBang'],
-            [55, 'BuzzBang'],
-            [35, 'BuzzWhizz'],
-            [33, 'FizzBang'],
-            [21, 'FizzWhizz'],
-            [15, 'FizzBuzz'],
             [3, 'Fizz'],
             [5, 'Buzz'],
             [7, 'Whizz'],
