@@ -1,5 +1,6 @@
 import {ToyRepository} from "../domain/toyRepository";
 import {Toy} from "../domain/toy";
+import { Option } from "effect"
 
 export class ToyProductionService {
     private repository: ToyRepository;
@@ -9,10 +10,13 @@ export class ToyProductionService {
     }
 
     assignToyToElf(toyName: string): void {
-        const toy = this.repository.findByName(toyName);
-        if (toy && toy.getState() === Toy.State.UNASSIGNED) {
-            toy.setState(Toy.State.IN_PRODUCTION);
-            this.repository.save(toy);
-        }
+        Option.match(this.repository.findByName(toyName), {
+            onSome: (toy) => {
+                toy.assignToElf();
+                this.repository.save(toy);
+            },
+            onNone: () => {}
+        })
+
     }
 }
