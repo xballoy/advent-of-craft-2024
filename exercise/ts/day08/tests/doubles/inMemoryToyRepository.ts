@@ -1,11 +1,12 @@
 import {Toy} from "../../src/domain/toy";
 import {ToyRepository} from "../../src/domain/toyRepository";
+import { Option } from 'effect';
 
 export class InMemoryToyRepository implements ToyRepository {
     private toys: Toy[] = [];
 
-    findByName(name: string): Toy | null {
-        return this.toys.find(t => t.getName() === name) || null;
+    findByName(name: string): Option.Option<Toy> {
+        return Option.fromNullable(this.toys.find(t => t.getName() === name));
     }
 
     save(toy: Toy): void {
