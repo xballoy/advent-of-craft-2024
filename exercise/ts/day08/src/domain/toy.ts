@@ -8,20 +8,30 @@ export class Toy {
     private readonly name: string;
     private state: string;
 
-    constructor(name: string, state: string) {
+    constructor(name: string) {
         this.name = name;
-        this.state = state;
+        this.state = Toy.State.UNASSIGNED;
     }
 
     getName(): string {
         return this.name;
     }
 
-    getState(): string {
-        return this.state;
+    assignToElf() {
+        if(this.isUnassigned) {
+            this.markInProduction();
+        }
     }
 
-    setState(state: string): void {
-        this.state = state;
+    get isUnassigned() {
+        return this.state === Toy.State.UNASSIGNED;
+    }
+
+    get isInProduction() {
+        return this.state === Toy.State.IN_PRODUCTION;
+    }
+
+    markInProduction() {
+        return this.state = Toy.State.IN_PRODUCTION;
     }
 }
