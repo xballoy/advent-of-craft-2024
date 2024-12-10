@@ -6,7 +6,14 @@ export class Building {
             const c = instructions[i];
 
             if (instructions.includes("🧝")) {
-                const j = c === ')' ? 3 : -2;
+                let j: number;
+                if (c === ')') {
+                    j = 3;
+                } else if (c === '(') {
+                    j = -2;
+                } else {
+                    j = 0;
+                }
                 val.push([c, j]);
             } else if (!instructions.includes("🧝")) {
                 val.push([c, c === '(' ? 1 : -1]);
