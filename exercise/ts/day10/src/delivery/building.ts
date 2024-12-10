@@ -1,25 +1,33 @@
+import { Match } from 'effect';
+
+type InstructionToFloorFn = (char: string) => number;
+const InstructionWithElf: InstructionToFloorFn = (char: string) =>
+    Match.value(char).pipe(
+        Match.when(')', () => 3),
+        Match.when('(', () => -2),
+        Match.when('🧝', () => 0),
+        Match.exhaustive,
+    );
+const InstructionWithoutElf: InstructionToFloorFn = (char: string) =>
+    Match.value(char).pipe(
+        Match.when(')', () => -1),
+        Match.when('(', () => 1),
+        Match.exhaustive,
+    );
+
 export class Building {
     static whichFloor(instructions: string): number {
-        let val: Array<[string, number]> = [];
+        const rules: InstructionToFloorFn = this.getRules(instructions);
+        return Array.from(instructions).reduce((floor, instruction) => {
+            return floor + rules(instruction);
+        }, 0);
+    }
 
-        for (let i = 0; i < instructions.length; i++) {
-            const c = instructions[i];
+    private static getRules(instructions: string) {
+        return this.includesElf(instructions) ? InstructionWithElf : InstructionWithoutElf;
+    }
 
-            if (instructions.includes("🧝")) {
-                const j = c === ')' ? 3 : -2;
-                val.push([c, j]);
-            } else if (!instructions.includes("🧝")) {
-                val.push([c, c === '(' ? 1 : -1]);
-            } else {
-                val.push([c, c === '(' ? 42 : -2]);
-            }
-        }
-
-        let result = 0;
-        for (const kp of val) {
-            result += kp[1];
-        }
-
-        return result;
+    private static includesElf(instructions: string) {
+        return instructions.includes('🧝');
     }
 }
