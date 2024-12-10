@@ -1,32 +1,28 @@
 export class Building {
     static whichFloor(instructions: string): number {
-        let val: Array<[string, number]> = [];
+        const instructionIncludesElf = this.includesElf(instructions);
 
-        for (let i = 0; i < instructions.length; i++) {
-            const c = instructions[i];
-
-            if (instructions.includes("🧝")) {
-                let j: number;
-                if (c === ')') {
-                    j = 3;
-                } else if (c === '(') {
-                    j = -2;
+        return instructions.split('').reduce((acc, instruction) => {
+            if (instructionIncludesElf) {
+                if (instruction === ')') {
+                    acc += 3;
+                } else if (instruction === '(') {
+                    acc += -2;
                 } else {
-                    j = 0;
+                    acc += 0;
                 }
-                val.push([c, j]);
-            } else if (!instructions.includes("🧝")) {
-                val.push([c, c === '(' ? 1 : -1]);
             } else {
-                val.push([c, c === '(' ? 42 : -2]);
+                if(instruction === '(') {
+                    acc += 1;
+                } else {
+                    acc += -1
+                }
             }
-        }
+            return acc;
+        }, 0)
+    }
 
-        let result = 0;
-        for (const kp of val) {
-            result += kp[1];
-        }
-
-        return result;
+    private static includesElf(instructions: string) {
+        return instructions.includes('🧝');
     }
 }
