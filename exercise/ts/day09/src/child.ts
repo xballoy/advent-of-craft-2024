@@ -1,3 +1,4 @@
+import { Behavior } from "./behavior";
 import {GiftRequest} from "./giftRequest";
 
 export class Child {
@@ -6,8 +7,8 @@ export class Child {
     public readonly giftRequest: GiftRequest;
 
     constructor(firstName: string,
-                lastName: string,
-                age: number,
+                _lastName: string,
+                _age: number,
                 behavior: Behavior,
                 giftRequest: GiftRequest) {
         this.name = firstName;

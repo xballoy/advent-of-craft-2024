@@ -10,6 +10,7 @@
     "@types/jest": "^29.5.8"
   },
   "scripts": {
+    "check-types": "tsc --noEmit",
     "test": "jest"
   }
 }

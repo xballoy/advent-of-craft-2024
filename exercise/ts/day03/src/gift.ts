@@ -9,7 +9,7 @@ export class Gift {
     ) {
     }
 
-    public assignToChild(childName: string): void {
+    public assignToChild(_childName: string): void {
     }
 
     public addAttribute(key: string, value: string): void {

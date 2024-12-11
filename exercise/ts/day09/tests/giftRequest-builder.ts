@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { GiftRequest } from '../src/giftRequest';
+import { Priority } from '../src/priority';
 
 export class GiftRequestBuilder {
     private readonly giftName: string;

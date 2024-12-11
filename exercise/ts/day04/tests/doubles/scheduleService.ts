@@ -10,7 +10,7 @@ export class ScheduleServiceDouble implements ScheduleService{
     get organizeMyDayCalled() {
         return this._organizeMyDayCalled;
     }
-    organizeMyDay(schedule: Schedule) {
+    organizeMyDay(_schedule: Schedule) {
         this._organizeMyDayCalled = true;
     }
 

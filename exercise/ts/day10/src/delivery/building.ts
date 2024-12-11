@@ -6,12 +6,14 @@ const InstructionWithElf: InstructionToFloorFn = (char: string) =>
         Match.when(')', () => 3),
         Match.when('(', () => -2),
         Match.when('🧝', () => 0),
+        // @ts-expect-error
         Match.exhaustive,
     );
 const InstructionWithoutElf: InstructionToFloorFn = (char: string) =>
     Match.value(char).pipe(
         Match.when(')', () => -1),
         Match.when('(', () => 1),
+        // @ts-expect-error
         Match.exhaustive,
     );
 

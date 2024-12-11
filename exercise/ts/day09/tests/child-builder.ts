@@ -2,6 +2,7 @@ import { GiftRequest } from '../src/giftRequest';
 import { faker } from '@faker-js/faker';
 import { Child } from '../src/child';
 import { GiftRequestBuilder } from './giftRequest-builder';
+import { Behavior } from '../src/behavior';
 
 export class ChildBuilder {
     private readonly firstName: string;

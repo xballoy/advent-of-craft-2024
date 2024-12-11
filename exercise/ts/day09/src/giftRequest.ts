@@ -1,3 +1,5 @@
+import { Priority } from "./priority";
+
 export class GiftRequest {
     public readonly giftName: string;
     public readonly isFeasible: boolean;

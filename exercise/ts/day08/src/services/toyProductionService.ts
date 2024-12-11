@@ -1,5 +1,4 @@
 import {ToyRepository} from "../domain/toyRepository";
-import {Toy} from "../domain/toy";
 import { Option } from "effect"
 
 export class ToyProductionService {

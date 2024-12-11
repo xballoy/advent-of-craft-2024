@@ -14,9 +14,9 @@ export class ElfWorkshop {
 
     // Comment: some path return null, some return a string.
     // Maybe return an object success: true/false or an option that return the completed task.
-    completeTask(): string {
+    completeTask(): string | null {
         if (this.taskList.length > 0) {
-            return this.taskList.shift();
+            return this.taskList.shift() ?? null;
         }
         return null;
     }
