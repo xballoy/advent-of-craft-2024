@@ -1,4 +1,5 @@
 import {ToyType} from "./toyType";
+import { Match } from 'effect';
 
 export class Preparation {
     static prepareGifts(numberOfGifts: number): string {
@@ -24,15 +25,11 @@ export class Preparation {
     static ensureToyBalance(toyType: ToyType, toysCount: number, totalToys: number): boolean {
         const typePercentage = toysCount / totalToys;
 
-        switch (toyType) {
-            case ToyType.EDUCATIONAL:
-                return typePercentage >= 0.25;
-            case ToyType.FUN:
-                return typePercentage >= 0.30;
-            case ToyType.CREATIVE:
-                return typePercentage >= 0.20;
-            default:
-                return false;
-        }
+        return Match.value(toyType).pipe(
+            Match.when(ToyType.EDUCATIONAL, () => typePercentage >= 0.25),
+            Match.when(ToyType.FUN, () => typePercentage >= 0.30),
+            Match.when(ToyType.CREATIVE, () => typePercentage >= 0.20),
+            Match.exhaustive
+        )
     }
 }
