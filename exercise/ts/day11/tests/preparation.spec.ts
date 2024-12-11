@@ -14,8 +14,11 @@ describe('Preparation', () => {
 
     test.each([
         [1, 'Baby'],
+        [2, 'Baby'],
         [3, 'Toddler'],
+        [5, 'Toddler'],
         [6, 'Child'],
+        [12, 'Child'],
         [13, 'Teen']
     ])('categorizeGift should return the correct category for age %d', (age, expectedCategory) => {
         expect(Preparation.categorizeGift(age)).toBe(expectedCategory);
