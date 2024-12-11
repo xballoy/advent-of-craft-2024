@@ -12,6 +12,7 @@
     "ts-jest": "^29.1.1"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:mutation": "npx stryker run"
   }
 }
