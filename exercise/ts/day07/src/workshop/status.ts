@@ -1,4 +1,4 @@
 export enum Status {
-    Producing = 'Producing',
-    Produced = 'Produced'
+  Producing = 'Producing',
+  Produced = 'Produced',
 }
