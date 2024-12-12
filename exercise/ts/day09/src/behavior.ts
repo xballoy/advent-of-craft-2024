@@ -1,1 +1,1 @@
-type Behavior = "naughty" | "nice";
+export type Behavior = 'naughty' | 'nice';
