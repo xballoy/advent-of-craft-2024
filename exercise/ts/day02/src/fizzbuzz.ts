@@ -1,14 +1,14 @@
-import {none, Option, some} from "fp-ts/Option";
+import {Option} from "effect";
 
 type Config = {
     mapping: Map<number, string>;
     min: number;
     max: number;
 }
-export const fizzbuzz = ({mapping, min, max}: Config) => (input: number): Option<string> =>
+export const fizzbuzz = ({mapping, min, max}: Config) => (input: number): Option.Option<string> =>
     isOutOfRange({min, max})(input)
-        ? none
-        : some(convertSafely(mapping)(input));
+        ? Option.none()
+        : Option.some(convertSafely(mapping)(input));
 
 const convertSafely = (mapping: Map<number, string>) => (input: number): string => {
     const values: string[] = [];

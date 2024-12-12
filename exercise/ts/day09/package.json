@@ -2,13 +2,13 @@
   "name": "gift-wish",
   "version": "1.0.0",
   "dependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "5.7.2"
   },
   "devDependencies": {
     "@faker-js/faker": "9.3.0",
-    "@types/jest": "^29.5.8",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.1.1"
+    "@types/jest": "29.5.14",
+    "jest": "29.7.0",
+    "ts-jest": "29.2.5"
   },
   "scripts": {
     "check-types": "tsc --noEmit",

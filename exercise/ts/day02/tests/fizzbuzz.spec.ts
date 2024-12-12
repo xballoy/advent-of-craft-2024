@@ -1,8 +1,6 @@
 import {fizzbuzz} from '../src/fizzbuzz';
-import * as O from 'fp-ts/Option';
-import {isNone, isSome} from 'fp-ts/Option';
 import * as fc from 'fast-check';
-import {pipe} from 'fp-ts/function';
+import { Option, pipe } from 'effect';
 
 describe('FizzBuzz should return', () => {
     const config = {
@@ -51,9 +49,9 @@ describe('FizzBuzz should return', () => {
         [98, 'Whizz'],
     ])('its representation %s -> %s', (input, expectedResult) => {
         const conversionResult = fizzbuzz(config)(input);
-        expect(isSome(conversionResult)).toBeTruthy();
+        expect(Option.isSome(conversionResult)).toBeTruthy();
 
-        if (isSome(conversionResult)) {
+        if (Option.isSome(conversionResult)) {
             expect(conversionResult.value).toBe(expectedResult);
         }
     });
@@ -69,7 +67,7 @@ describe('FizzBuzz should return', () => {
 
     const isConvertValid = (input: number): boolean => pipe(
         fizzbuzz(config)(input),
-        O.exists(result => validStringsFor(input).includes(result))
+        Option.exists(result => validStringsFor(input).includes(result))
     );
 
     const validStringsFor = (x: number): string[] => ['Fizz', 'Buzz', 'FizzBuzz', 'Bang', 'FizzBang', 'Whizz', 'FizzWhizz', x.toString()];
@@ -78,7 +76,7 @@ describe('FizzBuzz should return', () => {
         fc.assert(
             fc.property(
                 fc.integer().filter(n => n < config.min || n > config.max),
-                (n) => isNone(fizzbuzz(config)(n))
+                (n) => Option.isNone(fizzbuzz(config)(n))
             )
         );
     });
