@@ -1,9 +1,9 @@
-import {Schedule} from "./schedule";
+import type { Schedule } from './schedule';
 
 export interface ScheduleService {
-    todaySchedule(): Schedule;
+  todaySchedule(): Schedule;
 
-    organizeMyDay(schedule: Schedule): void;
+  organizeMyDay(schedule: Schedule): void;
 
-    continueDay(): void;
+  continueDay(): void;
 }
