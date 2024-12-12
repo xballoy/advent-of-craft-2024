@@ -1,3 +1,5 @@
+import { Match } from 'effect';
+import type { Behavior } from './Behavior';
 import type { Child } from './Child';
 import type { Toy } from './Toy';
 
@@ -17,22 +19,11 @@ export class Santa {
       throw new Error('No such child found');
     }
 
-    if (!foundChild.wishlist) {
-      return undefined;
-    }
-
-    if (foundChild.behavior === 'naughty') {
-      return foundChild.wishlist.thirdChoice;
-    }
-
-    if (foundChild.behavior === 'nice') {
-      return foundChild.wishlist.secondChoice;
-    }
-
-    if (foundChild.behavior === 'very nice') {
-      return foundChild.wishlist.firstChoice;
-    }
-
-    return undefined;
+    return Match.value<Behavior>(foundChild.behavior).pipe(
+      Match.when('naughty', () => foundChild.wishlist?.thirdChoice),
+      Match.when('nice', () => foundChild.wishlist?.secondChoice),
+      Match.when('very nice', () => foundChild.wishlist?.firstChoice),
+      Match.exhaustive,
+    );
   }
 }

@@ -2,9 +2,9 @@ import type { Toy } from './Toy';
 
 export class Wishlist {
   constructor(
-      private readonly _firstChoice: Toy,
-      private readonly _secondChoice: Toy,
-      private readonly _thirdChoice: Toy
+    private readonly _firstChoice: Toy,
+    private readonly _secondChoice: Toy,
+    private readonly _thirdChoice: Toy,
   ) {}
 
   get firstChoice(): Toy {

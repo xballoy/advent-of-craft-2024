@@ -1,3 +1,4 @@
+import type { Behavior } from './Behavior';
 import type { Toy } from './Toy';
 import { Wishlist } from './Wishlist';
 
@@ -6,10 +7,10 @@ export class Child {
 
   constructor(
     public name: string,
-    public behavior: string,
+    public behavior: Behavior,
   ) {}
 
   setWishlist(firstChoice: Toy, secondChoice: Toy, thirdChoice: Toy): void {
-    this.wishlist = new Wishlist(firstChoice, secondChoice, thirdChoice)
+    this.wishlist = new Wishlist(firstChoice, secondChoice, thirdChoice);
   }
 }
