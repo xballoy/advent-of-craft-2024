@@ -1,7 +1,7 @@
-import {Child} from "./child";
+import type { Child } from './child';
 
 export class SantaService {
-    public evaluateRequest(child: Child): boolean {
-        return child.behavior === "nice" && child.giftRequest.isFeasible;
-    }
+  public evaluateRequest(child: Child): boolean {
+    return child.behavior === 'nice' && child.giftRequest.isFeasible;
+  }
 }

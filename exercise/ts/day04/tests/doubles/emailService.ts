@@ -1,12 +1,12 @@
-import { EmailService } from '../../src/routine/emailService';
+import type { EmailService } from '../../src/routine/emailService';
 
 export class EmailServiceDouble implements EmailService {
-    private _readNewEmailsCalled: boolean = false;
+  private _readNewEmailsCalled = false;
 
-    get readNewEmailsCalled(): boolean {
-        return this._readNewEmailsCalled;
-    }
-    readNewEmails() {
-        this._readNewEmailsCalled = true;
-    }
+  get readNewEmailsCalled(): boolean {
+    return this._readNewEmailsCalled;
+  }
+  readNewEmails() {
+    this._readNewEmailsCalled = true;
+  }
 }
