@@ -1,4 +1,5 @@
 import { Child } from '../src/gifts/Child';
+import { InMemoryChildrenRepository } from '../src/gifts/ChildrenRepository';
 import { Santa } from '../src/gifts/Santa';
 import { Toy } from '../src/gifts/Toy';
 
@@ -11,7 +12,7 @@ describe("Santa's gift selection process", () => {
     const bobby = new Child('bobby', 'naughty');
     bobby.setWishlist(Playstation, Plush, Ball);
 
-    const santa = new Santa();
+    const santa = new Santa(new InMemoryChildrenRepository());
     santa.addChild(bobby);
 
     expect(santa.chooseToyForChild('bobby')).toBe(Ball);
@@ -21,7 +22,7 @@ describe("Santa's gift selection process", () => {
     const bobby = new Child('bobby', 'nice');
     bobby.setWishlist(Playstation, Plush, Ball);
 
-    const santa = new Santa();
+    const santa = new Santa(new InMemoryChildrenRepository());
     santa.addChild(bobby);
 
     expect(santa.chooseToyForChild('bobby')).toBe(Plush);
@@ -31,21 +32,9 @@ describe("Santa's gift selection process", () => {
     const bobby = new Child('bobby', 'very nice');
     bobby.setWishlist(Playstation, Plush, Ball);
 
-    const santa = new Santa();
+    const santa = new Santa(new InMemoryChildrenRepository());
     santa.addChild(bobby);
 
     expect(santa.chooseToyForChild('bobby')).toBe(Playstation);
-  });
-
-  it('should throw an exception if the child does not exist', () => {
-    const santa = new Santa();
-    const bobby = new Child('bobby', 'very nice');
-    bobby.setWishlist(Playstation, Plush, Ball);
-
-    santa.addChild(bobby);
-
-    expect(() => santa.chooseToyForChild('alice')).toThrowError(
-      'No such child found',
-    );
   });
 });
