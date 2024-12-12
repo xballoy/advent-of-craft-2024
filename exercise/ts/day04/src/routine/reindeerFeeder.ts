@@ -1,3 +1,3 @@
 export interface ReindeerFeeder {
-    feedReindeers(): void;
+  feedReindeers(): void;
 }

@@ -1,3 +1,3 @@
 export interface EmailService {
-    readNewEmails(): void;
+  readNewEmails(): void;
 }
