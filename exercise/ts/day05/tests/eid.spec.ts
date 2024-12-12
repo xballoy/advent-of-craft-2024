@@ -19,45 +19,42 @@
 import { isEid } from '../src/eid';
 
 describe('EID', () => {
-    it('should return false when eid is null', () => {
-        expect(isEid(null)).toBe(false);
-    });
+  it('should return false when eid is null', () => {
+    expect(isEid(null)).toBe(false);
+  });
 
-    it('should return false when eid is undefined', () => {
-        expect(isEid(undefined)).toBe(false);
-    });
+  it('should return false when eid is undefined', () => {
+    expect(isEid(undefined)).toBe(false);
+  });
 
-    it('should return false when eid is empty', () => {
-        expect(isEid('')).toBe(false);
-    });
+  it('should return false when eid is empty', () => {
+    expect(isEid('')).toBe(false);
+  });
 
-    it('should return false when eid is too short', () => {
-        expect(isEid('1000010')).toBe(false);
-    });
+  it('should return false when eid is too short', () => {
+    expect(isEid('1000010')).toBe(false);
+  });
 
-    it('should return false when eid is too long', () => {
-        expect(isEid('100001000')).toBe(false);
-    });
+  it('should return false when eid is too long', () => {
+    expect(isEid('100001000')).toBe(false);
+  });
 
-    it('should return false when eid is an invalid sex', () => {
-        expect(isEid('40000100')).toBe(false);
-    });
+  it('should return false when eid is an invalid sex', () => {
+    expect(isEid('40000100')).toBe(false);
+  });
 
-    it('should return false when eid is an invalid birthdate', () => {
-        expect(isEid('1aa00100')).toBe(false);
-    });
+  it('should return false when eid is an invalid birthdate', () => {
+    expect(isEid('1aa00100')).toBe(false);
+  });
 
-    it('should return false when eid is an invalid serial number', () => {
-        expect(isEid('10000000')).toBe(false);
-    });
+  it('should return false when eid is an invalid serial number', () => {
+    expect(isEid('10000000')).toBe(false);
+  });
 
-    it.each([
-        '19845606',
-        '30600233',
-        '29999922',
-        '11111151',
-        '19800767',
-    ])('should return true when eid is valid %s', (eid) => {
-        expect(isEid(eid)).toBe(true);
-    });
+  it.each(['19845606', '30600233', '29999922', '11111151', '19800767'])(
+    'should return true when eid is valid %s',
+    (eid) => {
+      expect(isEid(eid)).toBe(true);
+    },
+  );
 });
