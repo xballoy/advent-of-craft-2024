@@ -1,3 +1,3 @@
 export class Schedule {
-    tasks: string[] = [];
+  tasks: string[] = [];
 }

@@ -1,5 +1,5 @@
 export enum ToyType {
-    EDUCATIONAL = 'Educational',
-    FUN = 'Fun',
-    CREATIVE = 'Creative'
+  EDUCATIONAL = 'Educational',
+  FUN = 'Fun',
+  CREATIVE = 'Creative',
 }
