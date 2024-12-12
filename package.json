@@ -1,0 +1,19 @@
+{
+  "name": "advent-of-craft-2024",
+  "version": "1.0.0",
+  "description": "Advent of Craft 2024",
+  "packageManager": "npm@10.9.0",
+  "scripts": {
+    "quality:check": "npx @biomejs/biome check exercise/ts/*",
+    "quality:fix": "npx @biomejs/biome check --write exercise/ts/*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@tsconfig/node22": "22.0.0",
+    "@tsconfig/strictest": "2.0.5",
+    "turbo": "2.3.3"
+  },
+  "workspaces": [
+    "exercise/ts/*"
+  ]
+}
