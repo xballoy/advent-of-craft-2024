@@ -1,4 +1,4 @@
-import { Match } from 'effect';
+import { Match, Option } from 'effect';
 import type { Behavior } from './Behavior';
 import type { Child } from './Child';
 import type { Toy } from './Toy';
@@ -11,18 +11,18 @@ export class Santa {
   }
 
   chooseToyForChild(childName: string): Toy | undefined {
-    const foundChild = this.childrenRepository.find(
-      (child) => child.name === childName,
+    const maybeChild = Option.fromNullable(
+      this.childrenRepository.find((child) => child.name === childName),
+    );
+    const child = Option.getOrThrowWith(
+      maybeChild,
+      () => new Error('No such child found'),
     );
 
-    if (!foundChild) {
-      throw new Error('No such child found');
-    }
-
-    return Match.value<Behavior>(foundChild.behavior).pipe(
-      Match.when('naughty', () => foundChild.wishlist?.thirdChoice),
-      Match.when('nice', () => foundChild.wishlist?.secondChoice),
-      Match.when('very nice', () => foundChild.wishlist?.firstChoice),
+    return Match.value<Behavior>(child.behavior).pipe(
+      Match.when('naughty', () => child.wishlist?.thirdChoice),
+      Match.when('nice', () => child.wishlist?.secondChoice),
+      Match.when('very nice', () => child.wishlist?.firstChoice),
       Match.exhaustive,
     );
   }
