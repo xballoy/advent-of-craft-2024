@@ -1,31 +1,36 @@
+import type { Discount } from './Discount';
+import type { Product } from './Product';
 import { ReceiptItem } from './ReceiptItem';
-import { Discount } from './Discount';
-import {Product} from "./Product";
 
 export class Receipt {
-    private items: ReceiptItem[] = [];
-    private discounts: Discount[] = [];
+  private items: ReceiptItem[] = [];
+  private discounts: Discount[] = [];
 
-    addProduct(product: Product, quantity: number, price: number, totalPrice: number) {
-        this.items.push(new ReceiptItem(product, quantity, price, totalPrice));
-    }
+  addProduct(
+    product: Product,
+    quantity: number,
+    price: number,
+    totalPrice: number,
+  ) {
+    this.items.push(new ReceiptItem(product, quantity, price, totalPrice));
+  }
 
-    addDiscount(discount: Discount) {
-        this.discounts.push(discount);
-    }
+  addDiscount(discount: Discount) {
+    this.discounts.push(discount);
+  }
 
-    getTotalPrice(): number {
-        return (
-            this.items.reduce((sum, item) => sum + item.totalPrice, 0) +
-            this.discounts.reduce((sum, discount) => sum + discount.discountAmount, 0)
-        );
-    }
+  getTotalPrice(): number {
+    return (
+      this.items.reduce((sum, item) => sum + item.totalPrice, 0) +
+      this.discounts.reduce((sum, discount) => sum + discount.discountAmount, 0)
+    );
+  }
 
-    getItems(): ReadonlyArray<ReceiptItem> {
-        return this.items;
-    }
+  getItems(): ReadonlyArray<ReceiptItem> {
+    return this.items;
+  }
 
-    getDiscounts(): ReadonlyArray<Discount> {
-        return this.discounts;
-    }
+  getDiscounts(): ReadonlyArray<Discount> {
+    return this.discounts;
+  }
 }
