@@ -1,9 +1,9 @@
 import { Option } from 'effect';
 import { Discount } from './Discount';
-import type { MarketingOffer } from './MarketingOffer';
+import type { OfferType } from './OfferType';
 import type { Product } from './Product';
 
-export class XForYOffer implements MarketingOffer {
+export class XForYOffer implements OfferType {
   constructor(
     public x: number,
     public y: number,

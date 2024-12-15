@@ -1,9 +1,9 @@
 import { Option } from 'effect';
 import { Discount } from './Discount';
-import type { MarketingOffer } from './MarketingOffer';
+import type { OfferType } from './OfferType';
 import type { Product } from './Product';
 
-export class PercentageDiscountOffer implements MarketingOffer {
+export class PercentageDiscountOffer implements OfferType {
   constructor(public percentage: number) {}
 
   tryApplyOffer({
