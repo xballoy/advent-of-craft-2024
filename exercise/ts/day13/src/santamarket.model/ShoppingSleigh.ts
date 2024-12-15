@@ -5,6 +5,7 @@ import type { Product } from './Product';
 import type { Receipt } from './Receipt';
 import type { SantamarketCatalog } from './SantamarketCatalog';
 import { SpecialOfferType } from './SpecialOfferType';
+import { XForAmount } from './XForAmount';
 import { XForYOffer } from './XForYOffer';
 
 export class ShoppingSleigh {
@@ -37,9 +38,8 @@ export class ShoppingSleigh {
       }
 
       const unitPrice = catalog.getUnitPrice(product);
-      const quantityAsInt = Math.floor(quantity);
       let maybeDiscount: Option.Option<Discount> = Option.none();
-      let x = 1;
+
       if (offer.offerType === SpecialOfferType.THREE_FOR_TWO) {
         maybeDiscount = this.handleXForYOffers({
           offer: new XForYOffer(3, 2),
@@ -48,6 +48,7 @@ export class ShoppingSleigh {
           product,
         });
       }
+
       if (offer.offerType === SpecialOfferType.TWO_FOR_ONE) {
         maybeDiscount = this.handleXForYOffers({
           offer: new XForYOffer(2, 1),
@@ -56,30 +57,25 @@ export class ShoppingSleigh {
           product,
         });
       }
+
       if (offer.offerType === SpecialOfferType.TWO_FOR_AMOUNT) {
-        x = 2;
-        if (quantityAsInt >= 2) {
-          const total =
-            offer.argument * Math.floor(quantityAsInt / x) +
-            (quantityAsInt % 2) * unitPrice;
-          const discountN = unitPrice * quantity - total;
-          maybeDiscount = Option.some(
-            new Discount(product, `2 for ${offer.argument}`, -discountN),
-          );
-        }
+        maybeDiscount = this.handleXForAmountOffers({
+          offer: new XForAmount(2, offer.argument),
+          quantity,
+          unitPrice,
+          product,
+        });
       }
+
       if (offer.offerType === SpecialOfferType.FIVE_FOR_AMOUNT) {
-        x = 5;
-        const numberOfXs = Math.floor(quantityAsInt / x);
-        if (quantityAsInt >= 5) {
-          const discountTotal =
-            unitPrice * quantity -
-            (offer.argument * numberOfXs + (quantityAsInt % 5) * unitPrice);
-          maybeDiscount = Option.some(
-            new Discount(product, `5 for ${offer.argument}`, -discountTotal),
-          );
-        }
+        maybeDiscount = this.handleXForAmountOffers({
+          offer: new XForAmount(5, offer.argument),
+          quantity,
+          unitPrice,
+          product,
+        });
       }
+
       if (offer.offerType === SpecialOfferType.TEN_PERCENT_DISCOUNT) {
         const discountAmount = -quantity * unitPrice * (offer.argument / 100);
         maybeDiscount = Option.some(
@@ -115,6 +111,30 @@ export class ShoppingSleigh {
       (numberOfXs * offer.y * unitPrice + (quantity % offer.x) * unitPrice);
     return Option.some(
       new Discount(product, `${offer.x} for ${offer.y}`, -discountAmount),
+    );
+  }
+
+  private handleXForAmountOffers({
+    offer,
+    quantity,
+    unitPrice,
+    product,
+  }: {
+    offer: XForAmount;
+    quantity: number;
+    unitPrice: number;
+    product: Product;
+  }) {
+    if (quantity < offer.x) {
+      return Option.none();
+    }
+
+    const total =
+      offer.amount * Math.floor(quantity / offer.x) +
+      (quantity % offer.x) * unitPrice;
+    const discountN = unitPrice * quantity - total;
+    return Option.some(
+      new Discount(product, `${offer.x} for ${offer.amount}`, -discountN),
     );
   }
 }
