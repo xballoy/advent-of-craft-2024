@@ -1,6 +1,6 @@
 import { ChildMapper } from '../src/children/childMapper';
 import type { X5T78 } from '../src/children/db2/x5T78';
-import { type Child, Gender } from '../src/children/dtos/child';
+import type { Child } from '../src/children/dtos/child';
 
 describe('ChildMapper', () => {
   it('should map X5T78 to Child (Girl)', () => {
@@ -27,18 +27,23 @@ describe('ChildMapper', () => {
 
     const child: Child = ChildMapper.toDto(db2Child);
 
-    expect(child.Id).toBe(db2Child.Id);
-    expect(child.FirstName).toBe(db2Child.N_1);
-    expect(child.MiddleName).toBe(db2Child.N_2);
-    expect(child.LastName).toBe(db2Child.N_3);
-    expect(child.BirthCity).toBe(db2Child.CityOfBirth__pc);
-    expect(child.BirthDate).toBe('2017-03-19');
-    expect(child.Gender).toBe(Gender.Girl);
-    expect(child.Address).toBeDefined();
-    expect(child.Address?.Number).toBe(db2Child.ST_Num);
-    expect(child.Address?.Street).toBe(db2Child.ST____Name);
-    expect(child.Address?.City).toBe(db2Child.ST_C);
-    expect(child.Address?.CountryId).toBe(99);
+    expect(child).toMatchInlineSnapshot(`
+Child {
+  "Address": Address {
+    "City": "Paradise",
+    "CountryId": 99,
+    "Number": "123",
+    "Street": "Sunny Street",
+  },
+  "BirthCity": "Paradise",
+  "BirthDate": "2017-03-19",
+  "FirstName": "Alice",
+  "Gender": "Girl",
+  "Id": "1",
+  "LastName": "Smith",
+  "MiddleName": "Marie",
+}
+`);
   });
 
   it('should map X5T78 to Child (Boy)', () => {
@@ -65,17 +70,22 @@ describe('ChildMapper', () => {
 
     const child: Child = ChildMapper.toDto(db2Child);
 
-    expect(child.Id).toBe(db2Child.Id);
-    expect(child.FirstName).toBe(db2Child.N_1);
-    expect(child.MiddleName).toBe(db2Child.N_2);
-    expect(child.LastName).toBe(db2Child.N_3);
-    expect(child.BirthCity).toBe(db2Child.CityOfBirth__pc);
-    expect(child.BirthDate).toBe('2021-09-01');
-    expect(child.Gender).toBe(Gender.Boy);
-    expect(child.Address).toBeDefined();
-    expect(child.Address?.Number).toBe(db2Child.ST_Num);
-    expect(child.Address?.Street).toBe(db2Child.ST____Name);
-    expect(child.Address?.City).toBe(db2Child.ST_C);
-    expect(child.Address?.CountryId).toBe(98988);
+    expect(child).toMatchInlineSnapshot(`
+Child {
+  "Address": Address {
+    "City": "Paradise",
+    "CountryId": 98988,
+    "Number": "9",
+    "Street": "Oak Street",
+  },
+  "BirthCity": "Paradise",
+  "BirthDate": "2021-09-01",
+  "FirstName": "Bob",
+  "Gender": "Boy",
+  "Id": "2",
+  "LastName": "Brown",
+  "MiddleName": "",
+}
+`);
   });
 });
