@@ -1,6 +1,7 @@
 import { Option } from 'effect';
 import { Discount } from './Discount';
 import type { Offer } from './Offer';
+import { PercentageDiscountOffer } from './PercentageDiscountOffer';
 import type { Product } from './Product';
 import type { Receipt } from './Receipt';
 import type { SantamarketCatalog } from './SantamarketCatalog';
@@ -77,10 +78,12 @@ export class ShoppingSleigh {
       }
 
       if (offer.offerType === SpecialOfferType.TEN_PERCENT_DISCOUNT) {
-        const discountAmount = -quantity * unitPrice * (offer.argument / 100);
-        maybeDiscount = Option.some(
-          new Discount(product, `${offer.argument}% off`, discountAmount),
-        );
+        maybeDiscount = this.handlePercentageDiscountOffer({
+          offer: new PercentageDiscountOffer(offer.argument),
+          quantity,
+          unitPrice,
+          product,
+        });
       }
 
       Option.match(maybeDiscount, {
@@ -135,6 +138,23 @@ export class ShoppingSleigh {
     const discountN = unitPrice * quantity - total;
     return Option.some(
       new Discount(product, `${offer.x} for ${offer.amount}`, -discountN),
+    );
+  }
+
+  private handlePercentageDiscountOffer({
+    offer,
+    quantity,
+    unitPrice,
+    product,
+  }: {
+    offer: PercentageDiscountOffer;
+    quantity: number;
+    unitPrice: number;
+    product: Product;
+  }) {
+    const discountAmount = -quantity * unitPrice * (offer.percentage / 100);
+    return Option.some(
+      new Discount(product, `${offer.percentage}% off`, discountAmount),
     );
   }
 }
