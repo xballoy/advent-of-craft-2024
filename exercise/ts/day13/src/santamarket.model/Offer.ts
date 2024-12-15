@@ -1,6 +1,10 @@
-import {SpecialOfferType} from "./SpecialOfferType";
-import {Product} from "./Product";
+import type { Product } from './Product';
+import type { SpecialOfferType } from './SpecialOfferType';
 
 export class Offer {
-    constructor(public offerType: SpecialOfferType, public product: Product, public argument: number) {}
+  constructor(
+    public offerType: SpecialOfferType,
+    public product: Product,
+    public argument: number,
+  ) {}
 }
