@@ -5,7 +5,7 @@ import type { Product } from './Product';
 import type { Receipt } from './Receipt';
 import type { SantamarketCatalog } from './SantamarketCatalog';
 import { SpecialOfferType } from './SpecialOfferType';
-import { XForAmount } from './XForAmount';
+import { XForAmountOffer } from './XForAmountOffer';
 import { XForYOffer } from './XForYOffer';
 
 export class ShoppingSleigh {
@@ -60,7 +60,7 @@ export class ShoppingSleigh {
 
       if (offer.offerType === SpecialOfferType.TWO_FOR_AMOUNT) {
         maybeDiscount = this.handleXForAmountOffers({
-          offer: new XForAmount(2, offer.argument),
+          offer: new XForAmountOffer(2, offer.argument),
           quantity,
           unitPrice,
           product,
@@ -69,7 +69,7 @@ export class ShoppingSleigh {
 
       if (offer.offerType === SpecialOfferType.FIVE_FOR_AMOUNT) {
         maybeDiscount = this.handleXForAmountOffers({
-          offer: new XForAmount(5, offer.argument),
+          offer: new XForAmountOffer(5, offer.argument),
           quantity,
           unitPrice,
           product,
@@ -120,7 +120,7 @@ export class ShoppingSleigh {
     unitPrice,
     product,
   }: {
-    offer: XForAmount;
+    offer: XForAmountOffer;
     quantity: number;
     unitPrice: number;
     product: Product;
