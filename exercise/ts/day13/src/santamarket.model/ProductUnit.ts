@@ -1,4 +1,4 @@
 export enum ProductUnit {
-    KILO = 'KILO',
-    EACH = 'EACH',
+  KILO = 'KILO',
+  EACH = 'EACH',
 }
