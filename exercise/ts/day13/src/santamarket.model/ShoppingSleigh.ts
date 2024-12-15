@@ -1,4 +1,4 @@
-import { Option } from 'effect';
+import { Match, Option } from 'effect';
 import { Discount } from './Discount';
 import type { Offer } from './Offer';
 import { PercentageDiscountOffer } from './PercentageDiscountOffer';
@@ -39,57 +39,58 @@ export class ShoppingSleigh {
       }
 
       const unitPrice = catalog.getUnitPrice(product);
-      let maybeDiscount: Option.Option<Discount> = Option.none();
 
-      if (offer.offerType === SpecialOfferType.THREE_FOR_TWO) {
-        maybeDiscount = this.handleXForYOffers({
-          offer: new XForYOffer(3, 2),
-          quantity,
-          unitPrice,
-          product,
-        });
-      }
-
-      if (offer.offerType === SpecialOfferType.TWO_FOR_ONE) {
-        maybeDiscount = this.handleXForYOffers({
-          offer: new XForYOffer(2, 1),
-          quantity,
-          unitPrice,
-          product,
-        });
-      }
-
-      if (offer.offerType === SpecialOfferType.TWO_FOR_AMOUNT) {
-        maybeDiscount = this.handleXForAmountOffers({
-          offer: new XForAmountOffer(2, offer.argument),
-          quantity,
-          unitPrice,
-          product,
-        });
-      }
-
-      if (offer.offerType === SpecialOfferType.FIVE_FOR_AMOUNT) {
-        maybeDiscount = this.handleXForAmountOffers({
-          offer: new XForAmountOffer(5, offer.argument),
-          quantity,
-          unitPrice,
-          product,
-        });
-      }
-
-      if (offer.offerType === SpecialOfferType.TEN_PERCENT_DISCOUNT) {
-        maybeDiscount = this.handlePercentageDiscountOffer({
-          offer: new PercentageDiscountOffer(offer.argument),
-          quantity,
-          unitPrice,
-          product,
-        });
-      }
-
-      Option.match(maybeDiscount, {
-        onSome: (discount) => receipt.addDiscount(discount),
-        onNone: () => {},
-      });
+      Option.match(
+        Match.value(offer).pipe(
+          Match.when({ offerType: SpecialOfferType.THREE_FOR_TWO }, () =>
+            this.handleXForYOffers({
+              offer: new XForYOffer(3, 2),
+              quantity,
+              unitPrice,
+              product,
+            }),
+          ),
+          Match.when({ offerType: SpecialOfferType.TWO_FOR_ONE }, () =>
+            this.handleXForYOffers({
+              offer: new XForYOffer(2, 1),
+              quantity,
+              unitPrice,
+              product,
+            }),
+          ),
+          Match.when({ offerType: SpecialOfferType.TWO_FOR_AMOUNT }, (offer) =>
+            this.handleXForAmountOffers({
+              offer: new XForAmountOffer(2, offer.argument),
+              quantity,
+              unitPrice,
+              product,
+            }),
+          ),
+          Match.when({ offerType: SpecialOfferType.FIVE_FOR_AMOUNT }, (offer) =>
+            this.handleXForAmountOffers({
+              offer: new XForAmountOffer(5, offer.argument),
+              quantity,
+              unitPrice,
+              product,
+            }),
+          ),
+          Match.when(
+            { offerType: SpecialOfferType.TEN_PERCENT_DISCOUNT },
+            (offer) =>
+              this.handlePercentageDiscountOffer({
+                offer: new PercentageDiscountOffer(offer.argument),
+                quantity,
+                unitPrice,
+                product,
+              }),
+          ),
+          Match.exhaustive,
+        ),
+        {
+          onSome: (discount) => receipt.addDiscount(discount),
+          onNone: () => {},
+        },
+      );
     }
   }
 
