@@ -26,11 +26,11 @@ export class ChristmasElf {
     const receipt = new Receipt();
     const productQuantities = sleigh.getItems();
 
-    productQuantities.forEach(({ product, quantity }) => {
+    for (const { product, quantity } of productQuantities) {
       const unitPrice = this.catalog.getUnitPrice(product);
       const totalPrice = quantity * unitPrice;
       receipt.addProduct(product, quantity, unitPrice, totalPrice);
-    });
+    }
 
     sleigh.handleOffers(receipt, this.offers, this.catalog);
 

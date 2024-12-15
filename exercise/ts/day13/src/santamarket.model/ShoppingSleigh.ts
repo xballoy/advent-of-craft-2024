@@ -1,9 +1,11 @@
+import { Option } from 'effect';
 import { Discount } from './Discount';
 import type { Offer } from './Offer';
 import type { Product } from './Product';
 import type { Receipt } from './Receipt';
 import type { SantamarketCatalog } from './SantamarketCatalog';
 import { SpecialOfferType } from './SpecialOfferType';
+import { XForYOffer } from './XForYOffer';
 
 export class ShoppingSleigh {
   private items: { product: Product; quantity: number }[] = [];
@@ -37,14 +39,15 @@ export class ShoppingSleigh {
         let x = 1;
 
         if (offer.offerType === SpecialOfferType.THREE_FOR_TWO) {
-          x = 3;
-          const numberOfXs = Math.floor(quantityAsInt / x);
-          if (quantityAsInt >= 3) {
-            const discountAmount =
-              quantity * unitPrice -
-              (numberOfXs * 2 * unitPrice + (quantityAsInt % 3) * unitPrice);
-            discount = new Discount(product, '3 for 2', -discountAmount);
-          }
+          discount = Option.getOrNull(
+            this.handleXForYOffers({
+              offer: new XForYOffer(3, 2),
+              quantityAsInt,
+              quantity,
+              unitPrice,
+              product,
+            }),
+          );
         }
 
         if (offer.offerType === SpecialOfferType.TWO_FOR_AMOUNT) {
@@ -91,5 +94,32 @@ export class ShoppingSleigh {
         }
       }
     });
+  }
+
+  private handleXForYOffers({
+    offer,
+    quantityAsInt,
+    quantity,
+    unitPrice,
+    product,
+  }: {
+    offer: XForYOffer;
+    quantityAsInt: number;
+    quantity: number;
+    unitPrice: number;
+    product: Product;
+  }) {
+    const numberOfXs = Math.floor(quantityAsInt / offer.x);
+    if (quantityAsInt >= offer.x) {
+      const discountAmount =
+        quantity * unitPrice -
+        (numberOfXs * offer.y * unitPrice +
+          (quantityAsInt % offer.x) * unitPrice);
+      return Option.some(
+        new Discount(product, `${offer.x} for ${offer.y}`, -discountAmount),
+      );
+    }
+
+    return Option.none();
   }
 }
