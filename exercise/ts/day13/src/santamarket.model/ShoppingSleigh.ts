@@ -50,6 +50,18 @@ export class ShoppingSleigh {
           );
         }
 
+        if (offer.offerType === SpecialOfferType.TWO_FOR_ONE) {
+          discount = Option.getOrNull(
+            this.handleXForYOffers({
+              offer: new XForYOffer(2, 1),
+              quantityAsInt,
+              quantity,
+              unitPrice,
+              product,
+            }),
+          );
+        }
+
         if (offer.offerType === SpecialOfferType.TWO_FOR_AMOUNT) {
           x = 2;
           if (quantityAsInt >= 2) {

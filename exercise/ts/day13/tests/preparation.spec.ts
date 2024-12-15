@@ -86,6 +86,34 @@ describe('Santamarket Tests', () => {
     expect(receipt.getItems()[0]).toStrictEqual(expectedReceiptItem);
   });
 
+  it('applies two for one discount', () => {
+    const catalog = new FakeCatalog();
+    const teddyBear = new Product('teddyBear', ProductUnit.EACH);
+    catalog.addProduct(teddyBear, 1.0);
+
+    const elf = new ChristmasElf(catalog);
+    elf.addSpecialOffer(SpecialOfferType.TWO_FOR_ONE, teddyBear, 0);
+
+    const sleigh = new ShoppingSleigh();
+    sleigh.addItemQuantity(teddyBear, 2);
+
+    const receipt = elf.checksOutArticlesFrom(sleigh);
+
+    const expectedNonDiscountedPrice = 2.0;
+    const expectedTotalPrice = 1.0;
+    const expectedReceiptItem = new ReceiptItem(
+      teddyBear,
+      2,
+      1.0,
+      expectedNonDiscountedPrice,
+    );
+    const expectedDiscount = new Discount(teddyBear, '2 for 1', -1.0);
+
+    expect(receipt.getTotalPrice()).toBeCloseTo(expectedTotalPrice, 0.001);
+    expect(receipt.getDiscounts()[0]).toStrictEqual(expectedDiscount);
+    expect(receipt.getItems()[0]).toStrictEqual(expectedReceiptItem);
+  });
+
   it('applies two for amount discount', () => {
     const catalog = new FakeCatalog();
     const teddyBear = new Product('teddyBear', ProductUnit.EACH);
