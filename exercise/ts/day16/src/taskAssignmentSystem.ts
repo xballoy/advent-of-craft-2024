@@ -4,6 +4,7 @@ export class TaskAssignmentSystem {
   private readonly elves: Elf[] = [];
   private tasksCompleted = 0;
   private taskAssignments: Map<number, Elf> = new Map(); // Track current assignments
+  private nextTaskId = 1; // To generate unique task IDs
 
   constructor(elves: Elf[]) {
     this.elves = elves;
@@ -37,8 +38,12 @@ export class TaskAssignmentSystem {
       return aCount - bCount;
     });
 
-    // @ts-ignore
-    return sortedQualifiedElves[0];
+    // biome-ignore lint/style/noNonNullAssertion: we know sortedQualifiedElves has at least 1 entry
+    const assignedElf = sortedQualifiedElves[0]!;
+    const taskId = this.nextTaskId++;
+    this.taskAssignments.set(taskId, assignedElf);
+
+    return assignedElf;
   }
 
   // Reassign task without modifying skill levels

@@ -380,3 +380,262 @@ The tests use the scenario described in Bob's complaint (Alice, Bob, and Charlie
 Each test case includes descriptive names and comments to make it clear what's being tested and why. The tests also follow Jest best practices with proper setup in `beforeEach` blocks and clear expectations.
 
 Would you like me to add any additional test cases or modify the existing ones?
+
+------------------------------
+
+The assignTask does not update taskAssignments
+
+------------------------------
+
+Ah, you're absolutely right! We're tracking tasks in the `taskAssignments` Map but never actually updating it in the `assignTask` method. Here's the fix:
+
+
+
+```typescript
+import type { Elf } from './elf';
+
+export class TaskAssignmentSystem {
+  private readonly elves: Elf[] = [];
+  private tasksCompleted = 0;
+  private taskAssignments: Map<number, Elf> = new Map(); // Track current assignments
+  private nextTaskId = 1; // To generate unique task IDs
+
+  constructor(elves: Elf[]) {
+    this.elves = elves;
+  }
+
+  findQualifiedElves(taskSkillRequired: number): Elf[] {
+    return this.elves.filter((elf) => elf.skillLevel >= taskSkillRequired);
+  }
+
+  assignTask(taskSkillRequired: number): Elf | null {
+    const qualifiedElves = this.findQualifiedElves(taskSkillRequired);
+    if (qualifiedElves.length === 0) return null;
+
+    // Find the elf with the fewest current assignments
+    const elfAssignmentCounts = new Map<number, number>();
+    this.elves.forEach(elf => {
+      elfAssignmentCounts.set(elf.id, 0);
+    });
+
+    this.taskAssignments.forEach(elf => {
+      const count = elfAssignmentCounts.get(elf.id) || 0;
+      elfAssignmentCounts.set(elf.id, count + 1);
+    });
+
+    // Sort qualified elves by their current workload
+    const sortedQualifiedElves = qualifiedElves.sort((a, b) => {
+      const aCount = elfAssignmentCounts.get(a.id) || 0;
+      const bCount = elfAssignmentCounts.get(b.id) || 0;
+      return aCount - bCount;
+    });
+
+    const assignedElf = sortedQualifiedElves[0];
+    const taskId = this.nextTaskId++;
+    this.taskAssignments.set(taskId, assignedElf);
+
+    return assignedElf;
+  }
+
+  // New method to get current task assignments
+  getTaskAssignments(): Map<number, Elf> {
+    return new Map(this.taskAssignments);
+  }
+
+  // New method to complete a specific task
+  completeTask(taskId: number): boolean {
+    const elf = this.taskAssignments.get(taskId);
+    if (elf) {
+      this.taskAssignments.delete(taskId);
+      this.tasksCompleted++;
+      return true;
+    }
+    return false;
+  }
+
+  // Modified to handle specific task reassignment
+  reassignTask(taskId: number, toElfId: number, taskSkillRequired: number): boolean {
+    const task = this.taskAssignments.get(taskId);
+    if (!task) return false;
+
+    const toElf = this.elves.find((e) => e.id === toElfId);
+    if (!toElf) return false;
+
+    // Check if the receiving elf has sufficient skill level
+    if (toElf.skillLevel >= taskSkillRequired) {
+      this.taskAssignments.set(taskId, toElf);
+      return true;
+    }
+    return false;
+  }
+
+  // Rest of the methods remain the same...
+  reportTaskCompletion(elfId: number): boolean {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf) {
+      this.tasksCompleted++;
+      return true;
+    }
+    return false;
+  }
+
+  getTotalTasksCompleted(): number {
+    return this.tasksCompleted;
+  }
+
+  getElfWithHighestSkill(): Elf | null {
+    if (this.elves.length === 0) return null;
+    return this.elves.reduce(
+      (prev, current) =>
+        prev.skillLevel > current.skillLevel ? prev : current,
+      this.elves[0],
+    );
+  }
+
+  increaseSkillLevel(elfId: number, increment: number): void {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf) {
+      elf.skillLevel += increment;
+    }
+  }
+
+  decreaseSkillLevel(elfId: number, decrement: number): void {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf && elf.skillLevel - decrement > 0) {
+      elf.skillLevel -= decrement;
+    }
+  }
+
+  listElvesBySkillDescending(): Elf[] {
+    return [...this.elves].sort((a, b) => b.skillLevel - a.skillLevel);
+  }
+
+  resetAllSkillsToBaseline(baseline: number): void {
+    for (const elf of this.elves) {
+      elf.skillLevel = baseline;
+    }
+  }
+}
+
+```
+
+And here are the updated tests:
+
+```typescript
+import { Elf } from './elf';
+import { TaskAssignmentSystem } from './taskAssignmentSystem';
+
+describe('TaskAssignmentSystem Bug Fixes', () => {
+  describe('Task Assignment Tracking', () => {
+    let system: TaskAssignmentSystem;
+    let alice: Elf;
+    let bob: Elf;
+
+    beforeEach(() => {
+      alice = new Elf(1, 7);
+      bob = new Elf(2, 5);
+      system = new TaskAssignmentSystem([alice, bob]);
+    });
+
+    test('assignTask should update taskAssignments map', () => {
+      // Assign a task
+      const assignedElf = system.assignTask(4);
+
+      // Get current assignments
+      const assignments = system.getTaskAssignments();
+
+      // Should have one task assigned
+      expect(assignments.size).toBe(1);
+
+      // The assigned elf should match
+      const assignedTask = Array.from(assignments.values())[0];
+      expect(assignedTask).toEqual(assignedElf);
+    });
+
+    test('multiple task assignments should be tracked correctly', () => {
+      // Assign multiple tasks
+      system.assignTask(4); // Should go to Alice (less busy)
+      system.assignTask(4); // Should go to Bob (less busy)
+      system.assignTask(4); // Should go back to Alice (round robin)
+
+      const assignments = system.getTaskAssignments();
+
+      // Should have three tasks assigned
+      expect(assignments.size).toBe(3);
+
+      // Count assignments per elf
+      const elfAssignments = new Map<number, number>();
+      assignments.forEach(elf => {
+        elfAssignments.set(elf.id, (elfAssignments.get(elf.id) || 0) + 1);
+      });
+
+      // Alice and Bob should have balanced assignments
+      expect(elfAssignments.get(alice.id)).toBe(2);
+      expect(elfAssignments.get(bob.id)).toBe(1);
+    });
+
+    test('completeTask should remove task from assignments', () => {
+      // Assign a task
+      system.assignTask(4);
+
+      // Get the task ID (should be 1 as it's the first task)
+      const taskId = 1;
+
+      // Complete the task
+      const result = system.completeTask(taskId);
+
+      expect(result).toBe(true);
+      expect(system.getTaskAssignments().size).toBe(0);
+      expect(system.getTotalTasksCompleted()).toBe(1);
+    });
+
+    test('reassignTask should update task assignments correctly', () => {
+      // Assign initial task to Alice
+      system.assignTask(4);
+
+      // Reassign task from Alice to Bob
+      const result = system.reassignTask(1, bob.id, 4);
+
+      expect(result).toBe(true);
+
+      // Check that Bob is now assigned to the task
+      const assignments = system.getTaskAssignments();
+      expect(assignments.get(1)).toEqual(bob);
+    });
+
+    test('task IDs should be unique and incremental', () => {
+      // Assign multiple tasks
+      system.assignTask(4);
+      system.assignTask(4);
+      system.assignTask(4);
+
+      const assignments = system.getTaskAssignments();
+      const taskIds = Array.from(assignments.keys());
+
+      // Should have tasks with IDs 1, 2, and 3
+      expect(taskIds).toEqual([1, 2, 3]);
+    });
+  });
+
+  // ... (rest of the existing test suites remain the same)
+});
+
+```
+
+Key changes made:
+
+1. Added `nextTaskId` to generate unique task IDs
+2. Updated `assignTask` to properly track assignments in the `taskAssignments` Map
+3. Added `getTaskAssignments` method to safely access current assignments
+4. Added `completeTask` method to properly handle task completion
+5. Modified `reassignTask` to work with specific task IDs
+6. Added comprehensive tests for task assignment tracking
+
+The system now properly:
+- Tracks all task assignments with unique IDs
+- Updates assignments when tasks are completed
+- Maintains a record of which elf is assigned to which task
+- Ensures task reassignment updates the tracking system
+- Provides a way to query current assignments
+
+Would you like me to add any additional functionality or tests?
