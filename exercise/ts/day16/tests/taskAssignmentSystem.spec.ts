@@ -72,4 +72,11 @@ describe('TaskAssignmentSystem', () => {
     expect(elf?.id).toBe(1);
     expect(elf?.skillLevel).toBe(5);
   });
+
+  test('should assign task to people who have the expected level', () => {
+    const bob = new Elf(2, 5);
+    const underTest = new TaskAssignmentSystem([bob]);
+    const assigneElf = underTest.assignTask(5);
+    expect(assigneElf).toBe(bob);
+  });
 });

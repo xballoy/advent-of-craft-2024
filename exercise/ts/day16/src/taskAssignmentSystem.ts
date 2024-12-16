@@ -33,7 +33,7 @@ export class TaskAssignmentSystem {
 
   assignTask(taskSkillRequired: number): Elf | null {
     // @ts-ignore
-    return this.elves.find((elf) => elf.skillLevel >= taskSkillRequired + 1);
+    return this.elves.find((elf) => elf.skillLevel >= taskSkillRequired);
   }
 
   increaseSkillLevel(elfId: number, increment: number): void {
