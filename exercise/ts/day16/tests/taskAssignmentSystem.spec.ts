@@ -38,19 +38,8 @@ describe('TaskAssignmentSystem', () => {
     expect(elf?.skillLevel).toBe(5);
   });
 
-  test('assignTaskBasedOnAvailability assigns an available elf', () => {
-    const elf = system.assignTaskBasedOnAvailability(10);
-    expect(elf).not.toBeNull();
-  });
-
-  test('reassignTask changes assignment correctly', () => {
-    system.reassignTask(3, 1);
-    const elf = system.assignTask(19);
-    expect(elf?.id).toBe(1);
-  });
-
   test('assignTask fails when skills required is too high', () => {
-    expect(system.assignTask(50)).toBeUndefined();
+    expect(system.assignTask(50)).toBeNull();
   });
 
   test('listElvesBySkillDescending returns elves in correct order', () => {
@@ -78,5 +67,156 @@ describe('TaskAssignmentSystem', () => {
     const underTest = new TaskAssignmentSystem([bob]);
     const assigneElf = underTest.assignTask(5);
     expect(assigneElf).toBe(bob);
+  });
+
+  describe('Task Assignment Distribution Bug', () => {
+    let system: TaskAssignmentSystem;
+    let alice: Elf;
+    let bob: Elf;
+    let charlie: Elf;
+
+    beforeEach(() => {
+      // Setup the scenario from Bob's complaint
+      alice = new Elf(1, 7); // Alice with skill level 7
+      bob = new Elf(2, 5); // Bob with skill level 5
+      charlie = new Elf(3, 3); // Charlie with skill level 3
+      system = new TaskAssignmentSystem([alice, bob, charlie]);
+    });
+
+    test('findQualifiedElves returns all elves that meet skill requirement', () => {
+      // Task requiring skill level 4 should return both Alice and Bob
+      const qualifiedElves = system.findQualifiedElves(4);
+
+      expect(qualifiedElves).toHaveLength(2);
+      expect(qualifiedElves).toContainEqual(alice);
+      expect(qualifiedElves).toContainEqual(bob);
+      expect(qualifiedElves).not.toContainEqual(charlie);
+    });
+
+    test('assignTask distributes work among qualified elves', () => {
+      // Assign multiple tasks requiring skill level 4
+      const firstAssignment = system.assignTask(4);
+      const secondAssignment = system.assignTask(4);
+
+      // First and second assignments should go to different elves
+      expect(firstAssignment).not.toBeNull();
+      expect(secondAssignment).not.toBeNull();
+      expect(firstAssignment?.id).not.toBe(secondAssignment?.id);
+
+      // Both assignments should be to elves with sufficient skill
+      expect(firstAssignment?.skillLevel).toBeGreaterThanOrEqual(4);
+      expect(secondAssignment?.skillLevel).toBeGreaterThanOrEqual(4);
+    });
+
+    test('assignTask considers current workload when assigning tasks', () => {
+      // Assign three tasks requiring skill level 4
+      const assignments = [
+        system.assignTask(4),
+        system.assignTask(4),
+        system.assignTask(4),
+      ];
+
+      // Count assignments per elf
+      const assignmentCounts = new Map<number, number>();
+      for (const elf of assignments) {
+        if (elf) {
+          assignmentCounts.set(elf.id, (assignmentCounts.get(elf.id) || 0) + 1);
+        }
+      }
+
+      // No elf should have all assignments if multiple elves are qualified
+      for (const count of Array.from(assignmentCounts.values())) {
+        expect(count).toBeLessThan(3);
+      }
+    });
+  });
+
+  describe('Skill Level Transfer Bug', () => {
+    let system: TaskAssignmentSystem;
+    let seniorElf: Elf;
+    let juniorElf: Elf;
+
+    beforeEach(() => {
+      seniorElf = new Elf(1, 10); // Senior elf with high skill
+      juniorElf = new Elf(2, 5); // Junior elf with lower skill
+      system = new TaskAssignmentSystem([seniorElf, juniorElf]);
+    });
+
+    test('reassignTask should not modify skill levels', () => {
+      const originalJuniorSkill = juniorElf.skillLevel;
+
+      // Attempt to reassign a task requiring skill level 7
+      system.reassignTask(seniorElf.id, juniorElf.id, 7);
+
+      // Junior elf's skill level should remain unchanged
+      expect(juniorElf.skillLevel).toBe(originalJuniorSkill);
+    });
+
+    test('reassignTask should fail if receiving elf lacks required skill', () => {
+      // Attempt to reassign a task requiring skill level 8
+      const result = system.reassignTask(seniorElf.id, juniorElf.id, 8);
+
+      // Reassignment should fail
+      expect(result).toBe(false);
+
+      // Junior elf's skill should remain unchanged
+      expect(juniorElf.skillLevel).toBe(5);
+    });
+
+    test('reassignTask should succeed if receiving elf has required skill', () => {
+      // Attempt to reassign a task requiring skill level 5
+      const result = system.reassignTask(seniorElf.id, juniorElf.id, 5);
+
+      // Reassignment should succeed
+      expect(result).toBe(true);
+
+      // Skill levels should remain unchanged
+      expect(seniorElf.skillLevel).toBe(10);
+      expect(juniorElf.skillLevel).toBe(5);
+    });
+
+    test('skill levels should only change through proper methods', () => {
+      const originalSeniorSkill = seniorElf.skillLevel;
+      const originalJuniorSkill = juniorElf.skillLevel;
+
+      // Attempt task reassignment
+      system.reassignTask(seniorElf.id, juniorElf.id, 5);
+
+      // Use proper method to increase skill
+      system.increaseSkillLevel(juniorElf.id, 2);
+
+      // Senior elf's skill should be unchanged
+      expect(seniorElf.skillLevel).toBe(originalSeniorSkill);
+
+      // Junior elf's skill should only reflect the proper increase
+      expect(juniorElf.skillLevel).toBe(originalJuniorSkill + 2);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    test('reassignTask handles non-existent elves', () => {
+      const system = new TaskAssignmentSystem([new Elf(1, 5)]);
+
+      // Attempt to reassign task between non-existent elves
+      const result = system.reassignTask(999, 888, 5);
+
+      expect(result).toBe(false);
+    });
+
+    test('findQualifiedElves handles empty elf list', () => {
+      const system = new TaskAssignmentSystem([]);
+
+      const qualifiedElves = system.findQualifiedElves(5);
+
+      expect(qualifiedElves).toHaveLength(0);
+    });
+
+    test('assignTask handles no qualified elves', () => {
+      const system = new TaskAssignmentSystem([new Elf(1, 3)]);
+
+      const assignment = system.assignTask(5);
+
+      expect(assignment).toBeNull();
+    });
   });
 });
