@@ -5,11 +5,13 @@
     "typescript": "5.7.2"
   },
   "devDependencies": {
+    "@stryker-mutator/jest-runner": "8.7.1",
+    "@types/jest": "29.5.14",
     "jest": "29.7.0",
-    "ts-jest": "29.2.5",
-    "@types/jest": "29.5.14"
+    "ts-jest": "29.2.5"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test:mutation": "npx stryker run"
   }
 }
