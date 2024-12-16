@@ -12,17 +12,19 @@ export class Business {
   loadGiftsInSleigh(...children: Child[]): Sleigh {
     const sleigh = new Sleigh();
     for (const child of children) {
-      const gift = pipe(
-        this.wishList.identifyGift(child),
-        Either.flatMap((gift) => this.factory.findManufacturedGift(gift)),
-        Either.flatMap((manufacturedGift) =>
-          this.inventory.pickUpGift(manufacturedGift.barCode),
-        ),
-      );
-
-      sleigh.set(child, gift);
+      sleigh.set(child, this.getGiftFor(child));
     }
 
     return sleigh;
+  }
+
+  private getGiftFor(child: Child) {
+    return pipe(
+      this.wishList.identifyGift(child),
+      Either.flatMap((gift) => this.factory.findManufacturedGift(gift)),
+      Either.flatMap((manufacturedGift) =>
+        this.inventory.pickUpGift(manufacturedGift.barCode),
+      ),
+    );
   }
 }
