@@ -1,3 +1,5 @@
+import assert from 'node:assert';
+import { Either } from 'effect';
 import { Business } from '../src/business';
 import { Factory, Inventory, WishList } from '../src/dependencies';
 import { Child, Gift, ManufacturedGift } from '../src/models';
@@ -28,14 +30,34 @@ describe('Business Logic', () => {
     const business = new Business(factory, inventory, wishList);
     const sleigh = business.loadGiftsInSleigh(john);
 
-    expect(sleigh.get(john)).toBe('Gift: Toy has been loaded!');
+    const toyForJohn = sleigh.get(john);
+    assert(toyForJohn);
+    Either.match(toyForJohn, {
+      onRight: (gift) => {
+        expect(gift).toBe(toy);
+      },
+      onLeft: (error) => {
+        throw new Error(`Unexpected error: ${error.message}`);
+      },
+    });
   });
 
   test('Gift should not be loaded if child is not on the wish list', () => {
     const business = new Business(factory, inventory, wishList);
     const sleigh = business.loadGiftsInSleigh(john);
 
-    expect(sleigh.get(john)).toBe("Missing gift: Child wasn't nice this year!");
+    const toyForJohn = sleigh.get(john);
+    assert(toyForJohn);
+    Either.match(toyForJohn, {
+      onRight: (gift) => {
+        throw new Error(`Unexpected toy: ${gift.name}`);
+      },
+      onLeft: (error) => {
+        expect(error.message).toBe(
+          "Missing gift: Child wasn't nice this year!",
+        );
+      },
+    });
   });
 
   test('Gift should not be loaded if the toy was not manufactured', () => {
@@ -44,7 +66,16 @@ describe('Business Logic', () => {
     const business = new Business(factory, inventory, wishList);
     const sleigh = business.loadGiftsInSleigh(john);
 
-    expect(sleigh.get(john)).toBe("Missing gift: Gift wasn't manufactured!");
+    const toyForJohn = sleigh.get(john);
+    assert(toyForJohn);
+    Either.match(toyForJohn, {
+      onRight: (gift) => {
+        throw new Error(`Unexpected toy: ${gift.name}`);
+      },
+      onLeft: (error) => {
+        expect(error.message).toBe("Missing gift: Gift wasn't manufactured!");
+      },
+    });
   });
 
   test('Gift should not be loaded if the toy was misplaced', () => {
@@ -54,8 +85,17 @@ describe('Business Logic', () => {
     const business = new Business(factory, inventory, wishList);
     const sleigh = business.loadGiftsInSleigh(john);
 
-    expect(sleigh.get(john)).toBe(
-      'Missing gift: The gift has probably been misplaced by the elves!',
-    );
+    const toyForJohn = sleigh.get(john);
+    assert(toyForJohn);
+    Either.match(toyForJohn, {
+      onRight: (gift) => {
+        throw new Error(`Unexpected toy: ${gift.name}`);
+      },
+      onLeft: (error) => {
+        expect(error.message).toBe(
+          'Missing gift: The gift has probably been misplaced by the elves!',
+        );
+      },
+    });
   });
 });
