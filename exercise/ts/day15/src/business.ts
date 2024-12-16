@@ -20,11 +20,7 @@ export class Business {
         ),
       );
 
-      Either.match(gift, {
-        onRight: (gift) =>
-          sleigh.set(child, `Gift: ${gift.name} has been loaded!`),
-        onLeft: (error) => sleigh.set(child, error.message),
-      });
+      sleigh.set(child, gift);
     }
 
     return sleigh;
