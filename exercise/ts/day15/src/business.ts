@@ -14,35 +14,16 @@ export class Business {
     for (const child of children) {
       const gift = pipe(
         this.wishList.identifyGift(child),
-        Either.liftPredicate(
-          (gift) => !!gift,
-          () => "Missing gift: Child wasn't nice this year!",
-        ),
-        Either.flatMap((gift) =>
-          pipe(
-            this.factory.findManufacturedGift(gift),
-            Either.liftPredicate(
-              (it) => !!it,
-              () => "Missing gift: Gift wasn't manufactured!",
-            ),
-          ),
-        ),
+        Either.flatMap((gift) => this.factory.findManufacturedGift(gift)),
         Either.flatMap((manufacturedGift) =>
-          pipe(
-            this.inventory.pickUpGift(manufacturedGift.barCode),
-            Either.liftPredicate(
-              (it) => !!it,
-              () =>
-                'Missing gift: The gift has probably been misplaced by the elves!',
-            ),
-          ),
+          this.inventory.pickUpGift(manufacturedGift.barCode),
         ),
       );
 
       Either.match(gift, {
         onRight: (gift) =>
           sleigh.set(child, `Gift: ${gift.name} has been loaded!`),
-        onLeft: (error) => sleigh.set(child, error),
+        onLeft: (error) => sleigh.set(child, error.message),
       });
     }
 
