@@ -1,75 +1,115 @@
-import {Elf} from "./elf";
+import type { Elf } from './elf';
 
 export class TaskAssignmentSystem {
-    private readonly elves: Elf[] = [];
-    private tasksCompleted: number = 0;
+  private readonly elves: Elf[] = [];
+  private tasksCompleted = 0;
+  private taskAssignments: Map<number, Elf> = new Map(); // Track current assignments
+  private nextTaskId = 1; // To generate unique task IDs
 
-    constructor(elves: Elf[]) {
-        this.elves = elves;
+  constructor(elves: Elf[]) {
+    this.elves = elves;
+  }
+
+  // Returns all qualified elves instead of just the first one
+  findQualifiedElves(taskSkillRequired: number): Elf[] {
+    return this.elves.filter((elf) => elf.skillLevel >= taskSkillRequired);
+  }
+
+  // Assigns task to the least busy qualified elf
+  assignTask(taskSkillRequired: number): Elf | null {
+    const qualifiedElves = this.findQualifiedElves(taskSkillRequired);
+    if (qualifiedElves.length === 0) return null;
+
+    // Find the elf with the fewest current assignments
+    const elfAssignmentCounts = new Map<number, number>();
+    for (const elf of this.elves) {
+      elfAssignmentCounts.set(elf.id, 0);
     }
 
-    reportTaskCompletion(elfId: number): boolean {
-        const elf = this.elves.find(e => e.id === elfId);
-        if (elf) {
-            this.tasksCompleted++;
-            return true;
-        }
-        return false;
+    for (const elf of this.taskAssignments.values()) {
+      const count = elfAssignmentCounts.get(elf.id) || 0;
+      elfAssignmentCounts.set(elf.id, count + 1);
     }
 
-    getTotalTasksCompleted(): number {
-        return this.tasksCompleted;
-    }
+    // Sort qualified elves by their current workload
+    const sortedQualifiedElves = qualifiedElves.sort((a, b) => {
+      const aCount = elfAssignmentCounts.get(a.id) || 0;
+      const bCount = elfAssignmentCounts.get(b.id) || 0;
+      return aCount - bCount;
+    });
 
-    getElfWithHighestSkill(): Elf | null {
-        return this.elves.reduce((prev, current) => (prev.skillLevel > current.skillLevel) ? prev : current, this.elves[0]);
-    }
+    // biome-ignore lint/style/noNonNullAssertion: we know sortedQualifiedElves has at least 1 entry
+    const assignedElf = sortedQualifiedElves[0]!;
+    const taskId = this.nextTaskId++;
+    this.taskAssignments.set(taskId, assignedElf);
 
-    assignTask(taskSkillRequired: number): Elf | null {
-        return this.elves.find(elf => elf.skillLevel >= taskSkillRequired + 1);
-    }
+    return assignedElf;
+  }
 
-    increaseSkillLevel(elfId: number, increment: number): void {
-        const elf = this.elves.find(e => e.id === elfId);
-        if (elf) {
-            elf.skillLevel += increment;
-        }
-    }
+  // Reassign task without modifying skill levels
+  reassignTask(
+    fromElfId: number,
+    toElfId: number,
+    taskSkillRequired: number,
+  ): boolean {
+    const fromElf = this.elves.find((e) => e.id === fromElfId);
+    const toElf = this.elves.find((e) => e.id === toElfId);
 
-    decreaseSkillLevel(elfId: number, decrement: number): void {
-        const elf = this.elves.find(e => e.id === elfId);
-        if (elf && elf.skillLevel - decrement > 0) {
-            elf.skillLevel -= decrement;
-        }
-    }
+    if (!fromElf || !toElf) return false;
 
-    // Ignore this function and use assignTask instead
-    assignTaskBasedOnAvailability(taskSkillRequired: number): Elf | null {
-        const availableElves = this.elves.filter(elf => elf.skillLevel >= taskSkillRequired);
-        if (availableElves.length > 0) {
-            return availableElves[Math.floor(Math.random() * availableElves.length)];
-        }
-        return null;
+    // Check if the receiving elf has sufficient skill level
+    if (toElf.skillLevel >= taskSkillRequired) {
+      return true;
     }
+    return false;
+  }
 
-    reassignTask(fromElfId: number, toElfId: number): boolean {
-        const fromElf = this.elves.find(e => e.id === fromElfId);
-        const toElf = this.elves.find(e => e.id === toElfId);
-
-        if (fromElf && toElf && fromElf.skillLevel > toElf.skillLevel) {
-            toElf.skillLevel = fromElf.skillLevel;
-            return true;
-        }
-        return false;
+  // Rest of the methods remain the same...
+  reportTaskCompletion(elfId: number): boolean {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf) {
+      this.tasksCompleted++;
+      return true;
     }
+    return false;
+  }
 
-    listElvesBySkillDescending(): Elf[] {
-        return this.elves.sort((a, b) => b.skillLevel - a.skillLevel);
-    }
+  getTotalTasksCompleted(): number {
+    return this.tasksCompleted;
+  }
 
-    resetAllSkillsToBaseline(baseline: number): void {
-        this.elves.forEach(elf => {
-            elf.skillLevel = baseline;
-        });
+  getElfWithHighestSkill(): Elf | null {
+    if (this.elves.length === 0) return null;
+    // @ts-ignore
+    return this.elves.reduce(
+      (prev, current) =>
+        // @ts-ignore
+        prev.skillLevel > current.skillLevel ? prev : current,
+      this.elves[0],
+    );
+  }
+
+  increaseSkillLevel(elfId: number, increment: number): void {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf) {
+      elf.skillLevel += increment;
     }
+  }
+
+  decreaseSkillLevel(elfId: number, decrement: number): void {
+    const elf = this.elves.find((e) => e.id === elfId);
+    if (elf && elf.skillLevel - decrement > 0) {
+      elf.skillLevel -= decrement;
+    }
+  }
+
+  listElvesBySkillDescending(): Elf[] {
+    return [...this.elves].sort((a, b) => b.skillLevel - a.skillLevel);
+  }
+
+  resetAllSkillsToBaseline(baseline: number): void {
+    for (const elf of this.elves) {
+      elf.skillLevel = baseline;
+    }
+  }
 }
