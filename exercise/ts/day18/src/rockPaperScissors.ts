@@ -11,17 +11,22 @@ export class RockPaperScissors {
       return { winner: 'Draw', reason: 'same choice' };
     }
 
-    const rules: Record<Choice, { beats: Choice; reason: string }> = {
-      '🪨': { beats: '✂️', reason: 'rock crushes scissors' },
-      '📄': { beats: '🪨', reason: 'paper covers rock' },
-      '✂️': { beats: '📄', reason: 'scissors cuts paper' }
+    const rules: Record<Choice, { beats: Choice; reason: string }[]> = {
+      '🪨': [{ beats: '✂️', reason: 'rock crushes scissors' }],
+      '📄': [{ beats: '🪨', reason: 'paper covers rock' }],
+      '✂️': [{ beats: '📄', reason: 'scissors cuts paper' }]
     };
 
-    if (rules[player1].beats === player2) {
-      return { winner: 'Player 1', reason: rules[player1].reason };
+    const maybePlayer1Rule = rules[player1].find(rule => rule.beats === player2);
+    if (maybePlayer1Rule) {
+      return { winner: 'Player 1', reason: maybePlayer1Rule.reason };
     }
 
-    // Player 2 wins
-    return { winner: 'Player 2', reason: rules[player2].reason };
+    const maybePlayer2Rule = rules[player2].find(rule => rule.beats === player1);
+    if (maybePlayer2Rule) {
+      return { winner: 'Player 2', reason: maybePlayer2Rule.reason };
+    }
+
+    throw new Error(`Player 1 chooses ${player1} and Player 2 chooses ${player2} but no rule matches`);
   }
 }
