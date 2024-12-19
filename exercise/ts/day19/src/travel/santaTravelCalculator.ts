@@ -24,4 +24,10 @@ export class SantaTravelCalculator {
       1
     );
   }
+
+  public static calculateTotalDistanceNotRecursively(
+    numberOfReindeers: number,
+  ): number {
+    return 2 ** numberOfReindeers - 1;
+  }
 }
