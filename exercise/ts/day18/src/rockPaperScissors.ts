@@ -7,22 +7,21 @@ export type Result = {
 // biome-ignore lint/complexity/noStaticOnlyClass: keep exercise as-is
 export class RockPaperScissors {
   static play(player1: Choice, player2: Choice): Result {
-    if (player1 === player2) return { winner: 'Draw', reason: 'same choice' };
-    if (player1 === '🪨' && player2 === '✂️') {
-      return { winner: 'Player 1', reason: 'rock crushes scissors' };
+    if (player1 === player2) {
+      return { winner: 'Draw', reason: 'same choice' };
     }
-    if (player1 === '📄' && player2 === '🪨') {
-      return { winner: 'Player 1', reason: 'paper covers rock' };
+
+    const rules: Record<Choice, { beats: Choice; reason: string }> = {
+      '🪨': { beats: '✂️', reason: 'rock crushes scissors' },
+      '📄': { beats: '🪨', reason: 'paper covers rock' },
+      '✂️': { beats: '📄', reason: 'scissors cuts paper' }
+    };
+
+    if (rules[player1].beats === player2) {
+      return { winner: 'Player 1', reason: rules[player1].reason };
     }
-    if (player1 === '✂️' && player2 === '📄') {
-      return { winner: 'Player 1', reason: 'scissors cuts paper' };
-    }
-    if (player2 === '🪨' && player1 === '✂️') {
-      return { winner: 'Player 2', reason: 'rock crushes scissors' };
-    }
-    if (player2 === '📄' && player1 === '🪨') {
-      return { winner: 'Player 2', reason: 'paper covers rock' };
-    }
-    return { winner: 'Player 2', reason: 'scissors cuts paper' };
+
+    // Player 2 wins
+    return { winner: 'Player 2', reason: rules[player2].reason };
   }
 }
