@@ -1,0 +1,8 @@
+import { bench } from 'vitest';
+import { SantaTravelCalculator } from '../src/travel/santaTravelCalculator';
+
+describe('SantaTravelCalculator Bench', () => {
+  bench('Calculate distance recursively 30 reindeer', () => {
+    SantaTravelCalculator.calculateTotalDistanceRecursively(30);
+  });
+});
