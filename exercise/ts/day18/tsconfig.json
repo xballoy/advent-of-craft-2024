@@ -1,10 +1,26 @@
 {
+  "extends": "@tsconfig/node22/tsconfig",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es6",
+    // ts-node does not support extends as an array
+    // Begin @tsconfig/strictest/tsconfig
+    "strict": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    // End @tsconfig/strictest/tsconfig
+
     "sourceMap": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
