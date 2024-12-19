@@ -16,6 +16,8 @@ describe('SantaTravelCalculator', () => {
   const LargeCase = [
     [32, 4_294_967_295],
     [50, 1_125_899_906_842_623],
+    // Just for fun, this is the largest number of reindeers we can have using number and without having Infinity as a result.
+    [1023, 8.98846567431158e307],
   ];
 
   describe('calculateTotalDistanceRecursively', () => {
