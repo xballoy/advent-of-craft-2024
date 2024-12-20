@@ -25,12 +25,18 @@ describe('Reindeer API', () => {
       `${baseUrl}/reindeer/40f9d24d-d3e0-4596-adc5-b4936ff84b19`,
     );
     expect(response.status).toBe(200);
+    const body = await response.text();
+    expect(body).toMatchInlineSnapshot(
+      `"{"id":"40f9d24d-d3e0-4596-adc5-b4936ff84b19","name":"Petar","color":1}"`,
+    );
   });
 
   it('should return not found for non-existing reindeer', async () => {
     const nonExistingReindeer = uuidv4();
     const response = await fetch(`${baseUrl}/reindeer/${nonExistingReindeer}`);
     expect(response.status).toBe(404);
+    const body = await response.text();
+    expect(body).toMatchInlineSnapshot(`"Reindeer not found"`);
   });
 
   it('should return conflict when trying to create an existing reindeer', async () => {
@@ -44,5 +50,7 @@ describe('Reindeer API', () => {
       body: JSON.stringify(requestPayload),
     });
     expect(response.status).toBe(409);
+    const body = await response.text();
+    expect(body).toMatchInlineSnapshot(`"Reindeer already exists"`);
   });
 });
