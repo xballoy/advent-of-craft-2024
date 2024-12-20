@@ -4,22 +4,41 @@ import { v4 as uuidv4 } from 'uuid';
 import { app } from '../src';
 import { ReindeerColor } from '../src/types';
 
-let server: Server;
-let baseUrl: string;
-
-beforeAll((done) => {
-  server = app.listen(() => {
-    const { port } = server.address() as AddressInfo;
-    baseUrl = `http://localhost:${port}`;
-    done();
-  });
-});
-
-afterAll((done) => {
-  server.close(done);
-});
-
 describe('Reindeer API', () => {
+  let server: Server;
+  let baseUrl: string;
+
+  beforeAll(async () => {
+    return new Promise<void>((resolve) => {
+      server = app.listen(() => {
+        const { port } = server.address() as AddressInfo;
+        baseUrl = `http://localhost:${port}`;
+        resolve();
+      });
+
+      server.on('error', (error) => {
+        console.error('Server error:', error);
+      });
+    });
+  });
+
+  afterAll(async () => {
+    return new Promise<void>((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          console.error('Error closing server:', err);
+          reject(err);
+          return;
+        }
+        resolve();
+      });
+
+      setTimeout(() => {
+        server.closeAllConnections?.();
+      }, 1_000);
+    });
+  });
+
   describe('when using a valid API Key', () => {
     const VALID_API_KEY = '2FE35BA7-4894-445D-BDE1-F8E3D951A9A5';
 
