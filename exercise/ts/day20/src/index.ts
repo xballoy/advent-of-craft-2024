@@ -2,11 +2,22 @@ import { Either } from 'effect';
 import express from 'express';
 import { ReindeerService, type ReindeerToCreate } from './service';
 import { ReindeerErrorCode } from './types';
+import { validateApiKey } from './validateApiKey-middleware';
 
 export const app = express();
 app.use(express.json());
 
 const reindeerService = new ReindeerService();
+
+const apiKeyMiddleware = validateApiKey({
+  validApiKeys: [
+    {
+      client: 'some client',
+      key: '2FE35BA7-4894-445D-BDE1-F8E3D951A9A5',
+    },
+  ],
+});
+app.use(apiKeyMiddleware);
 
 app.get('/reindeer/:id', (req, res) => {
   const result = reindeerService.get(req.params.id);
