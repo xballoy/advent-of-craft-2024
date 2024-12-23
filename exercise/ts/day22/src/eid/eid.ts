@@ -35,7 +35,11 @@ export class EID {
 
   private checkKey(potentialKey: string): boolean {
     const key = Number.parseInt(potentialKey);
-    return !Number.isNaN(key) && this.key() === key;
+    return (
+      !Number.isNaN(key) &&
+      this.key() === key &&
+      potentialKey === this.key().toString().padStart(2, '0')
+    );
   }
 
   private stringWithoutKey(): string {
@@ -56,7 +60,7 @@ export class EID {
     return this.stringWithoutKey() + this.key().toString().padStart(2, '0');
   }
 
-  equals(other: EID): boolean {
+  equals(other: unknown): boolean {
     if (!(other instanceof EID)) {
       return false;
     }
