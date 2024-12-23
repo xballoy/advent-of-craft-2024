@@ -1,7 +1,5 @@
 import { Either } from 'effect';
-import fc from 'fast-check';
-import { sample } from 'fast-check';
-import { isLeft, isRight } from 'fp-ts/Either';
+import fc, { sample } from 'fast-check';
 import { EID } from '../src/eid/eid';
 import { SerialNumber } from '../src/eid/serialNumber';
 import { Sex } from '../src/eid/sex';
@@ -32,11 +30,15 @@ describe('EID', () => {
     fc.assert(
       fc.property(eidGenerator, (validEID) => {
         const parsedEID = EID.parse(validEID.toString());
-        expect(isRight(parsedEID)).toBe(true);
 
-        if (isRight(parsedEID)) {
-          expect(parsedEID.right.equals(validEID)).toBeTruthy();
-        }
+        Either.match(parsedEID, {
+          onRight: (eid) => {
+            expect(eid.equals(validEID)).toBeTruthy();
+          },
+          onLeft: (e) => {
+            throw new Error(`Expected valid EID, got ${e.message}`);
+          },
+        });
       }),
     );
   });
@@ -46,7 +48,14 @@ describe('EID', () => {
       fc.property(eidGenerator, mutantGenerator, (validEID, mutator) => {
         const mutated = mutator.mutate(validEID);
         const parsed = EID.parse(mutated);
-        expect(isLeft(parsed)).toBeTruthy();
+        Either.match(parsed, {
+          onRight: (eid) => {
+            throw new Error(`Expected invalid EID, got ${eid.toString()}`);
+          },
+          onLeft: (e) => {
+            expect(e).toBeTruthy();
+          },
+        });
       }),
     );
   });
@@ -64,8 +73,61 @@ class Mutator {
   }
 }
 
-const aMutator: Mutator = new Mutator('a mutator', (_eid: EID) =>
-  fc.constant('Implement this first mutator'),
+const tooShortEidMutator: Mutator = new Mutator(
+  'too short mutator',
+  (eid: EID) =>
+    fc.integer({ min: 0, max: eid.toString().length - 1 }).map((position) => {
+      return eid
+        .toString()
+        .split('')
+        .filter((_, i) => i !== position)
+        .join('');
+    }),
+);
+const tooLongEidMutator: Mutator = new Mutator('too long mutator', (eid: EID) =>
+  fc.char().map((char) => {
+    return eid.toString() + char;
+  }),
+);
+const invalidSexMutator: Mutator = new Mutator(
+  'invalid sex mutator',
+  (eid: EID) =>
+    fc
+      .char()
+      // @ts-ignore
+      .filter((char) => ![Sex.Sloubi, Sex.Gagna, Sex.Catact].includes(char))
+      .map((char) => {
+        return char + eid.toString().substring(1, 8);
+      }),
+);
+const invalidYearMutator: Mutator = new Mutator(
+  'invalid year mutator',
+  (eid: EID) =>
+    fc
+      .string({ minLength: 2, maxLength: 2 })
+      .filter((year) => Number.isNaN(Number.parseInt(year)))
+      .map(
+        (year) =>
+          eid.toString().substring(0, 1) + year + eid.toString().substring(3),
+      ),
+);
+const invalidSerialMutator: Mutator = new Mutator(
+  'invalid serial mutator',
+  (eid: EID) => {
+    return fc
+      .string({ minLength: 3, maxLength: 3 })
+      .filter((serial) => Number.isNaN(Number.parseInt(serial)))
+      .map(
+        (serial) =>
+          eid.toString().substring(0, 3) + serial + eid.toString().substring(6),
+      );
+  },
 );
 
-const mutantGenerator: fc.Arbitrary<Mutator> = fc.constant(aMutator);
+const mutantGenerator: fc.Arbitrary<Mutator> = fc.constantFrom(
+  tooShortEidMutator,
+  tooLongEidMutator,
+  invalidSexMutator,
+  invalidYearMutator,
+  invalidSerialMutator,
+);
