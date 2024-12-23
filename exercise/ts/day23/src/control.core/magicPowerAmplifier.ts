@@ -1,13 +1,13 @@
-import {AmplifierType} from "./amplifierType";
+import type { AmplifierType } from './amplifierType';
 
 export class MagicPowerAmplifier {
-    private amplifierType: AmplifierType;
+  private amplifierType: AmplifierType;
 
-    constructor(amplifierType: AmplifierType) {
-        this.amplifierType = amplifierType;
-    }
+  constructor(amplifierType: AmplifierType) {
+    this.amplifierType = amplifierType;
+  }
 
-    public amplify(magicPower: number): number {
-        return magicPower > 0 ? magicPower * this.amplifierType : magicPower;
-    }
+  public amplify(magicPower: number): number {
+    return magicPower > 0 ? magicPower * this.amplifierType : magicPower;
+  }
 }
